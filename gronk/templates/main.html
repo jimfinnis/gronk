@@ -1,6 +1,44 @@
 {% extends "base.html" %}
+
+{% block title %}
+{{title}}
+{% end %}
+
+{% block nav %}
+<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+<a class="navbar-brand" href="#">{{title}}</a>
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarCollapse">
+    <ul class="navbar-nav mr-auto">
+        {% for x in navs %}
+        {% if x == name %}
+        <li class="nav-item active">
+        <a class="nav-link" href="/{{x}}">{{x}}</a>
+        </li>
+        {% else %}
+        <li class="nav-item">
+        <a class="nav-link" href="/{{x}}">{{x}}</a>
+        </li>
+        {% end %}
+        {% end %}
+    </ul>
+</div>
+</nav>
+{% end %}
+
+
 {% block contents %}
 <div class="container">
     {% raw content %}
+</div>
+<div class="container">
+    {% if isdefault %}
+    <div class="alert alert-info">
+        This is a default page provided with gronk. Add a page of the same
+        name in the current directory to replace it.
+    </div>
+    {% end %}
 </div>
 {% end %}

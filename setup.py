@@ -14,7 +14,8 @@ def package_files(directory):
             paths.append(os.path.join('..', path, filename))
     return paths
 
-extra_files = package_files('gronk/static')
+static_files = package_files('gronk/static')
+default_pages = package_files('gronk/defaults')
 
 setup(name='gronk',
       version=version,
@@ -40,6 +41,7 @@ setup(name='gronk',
         ]
       },
       package_data = {
-        'gronk': {'':extra_files}
+        'gronk': {'':static_files},
+        'gronk': {'':default_pages}
       },
       )

@@ -51,16 +51,51 @@ class MainHandler(WebHandler):
         self.set_header('Cache-control','no-cache, no-store, must-revalidate')
         if name.endswith('/'):
             name = name[:-1]
-        file = os.path.join(datapath,name)+'.md'
+        mdname = name+'.md'
+        file = os.path.join(datapath,mdname)
         if os.path.exists(file):
-            text = codecs.open(file, mode="r", encoding="utf-8").read()
-            html = markdown.markdown(text,extensions=[wikilinks.WikiLinkExtension()])
-            return self.render_string('main.html',
-                name=name,
-                content=html)
+            isdefault=False
         else:
-            self.logger.critical("cannot find file: "+file)
-            return self.render_string('404.html',name=name)
+            # can't find it in the current dir - is it in the default pages?
+            file = os.path.join(resource_filename(__name__,'defaults'),mdname)
+            isdefault=True
+            if not os.path.exists(file):
+                self.logger.critical("cannot find file: "+file)
+                return self.render_string('404.html',name=name)
+        # we have the file, load and markdown.
+        text = codecs.open(file, mode="r", encoding="utf-8").read()
+        # split out the 'special' lines which start with @
+        specials=[]
+        lines=[]
+        text = text.split('\n')
+        for x in text:
+            if x.startswith('@'):
+                specials.append(x[1:])
+            else:
+                lines.append(x)
+        text = '\n'.join(lines)
+        
+        # now process the specials.
+        navs = []
+        title = name
+        for x in specials:
+            (cmd,rest) = x.split(' ',1)
+            if cmd == 'nav':
+                # 'nav x y z' puts links to x y z at the top
+                navs = rest.split()
+            elif cmd == 'title':
+                # title sets the title string (normally the name)
+                title = rest
+                
+        navs.insert(0,'index') # that's always there.
+        html = markdown.markdown(text,extensions=[wikilinks.WikiLinkExtension()])
+        return self.render_string('main.html',
+            name=name,
+            isdefault=isdefault,
+            navs=navs,
+            title=title,
+            content=html)
+        
         
 
 
