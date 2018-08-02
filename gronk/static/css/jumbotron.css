@@ -1,0 +1,32 @@
+/* Move down content because we have a fixed navbar that is 50px tall */
+body {
+  padding-top: 2rem;
+}
+
+.jumbotron {
+    background-color: blue;
+    color:white;
+/*  background: url(../img/4056_1_119.png) no-repeat center center fixed; */
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+
+}
+
+.jumbotron-heading {
+    font-weight:300
+}
+
+footer {
+  margin-left:20px;
+}
+
+.jumbotron a {
+  color: yellow;
+}
+
+blockquote p {
+  font-style: italic;
+  margin-left: 20px;
+}

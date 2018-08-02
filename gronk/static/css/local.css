@@ -1,0 +1,77 @@
+.btn-tag {
+    padding: .1rem .5rem;
+    font-size: 0.875rem;
+    line-height: 1.0;
+    border-radius: .4rem;    
+}    
+
+
+.page-footer {
+    border-style: solid none solid none;
+    border-width: 1px;
+    border-color: #d0d0d0;
+    padding: 1rem;
+    margin: 0px 1rem;
+}
+
+
+/* Badgebox */
+
+
+.btn-badgebox {
+    /* trbl */
+    padding: .1rem .1rem .1rem .3rem;
+    font-size: 0.75rem;
+    display: inline-flex;
+}
+
+
+
+/* Hiding the checkbox, but allowing it to be focused */
+.badgebox
+{
+    opacity: 0;
+}
+
+.btn-badgebox input {
+    width:1px;
+}
+
+.badgebox + .badge
+{
+    /* Move the check mark away when unchecked */
+    text-indent: -999999px;
+    /* Makes the badge's width stay the same checked and unchecked */
+    width: 20px;
+    padding-top:0.3rem;
+}
+
+.badgebox:focus + .badge
+{
+    /* Set something to make the badge looks focused */
+    /* This really depends on the application, in my case it was: */
+    
+    /* Adding a light border */
+    box-shadow: inset 0px 0px 5px;
+    /* Taking the difference out of the padding */
+}
+
+.badgebox:checked + .badge
+{
+    /* Move the check mark back when checked */
+	text-indent: 0;
+}
+
+
+.badgebox-neg + .badge
+{
+    /* negated checkbox! */
+    text-indent: 0px;
+}
+.badgebox-neg:checked + .badge
+{
+    /* negated checkbox! */
+    text-indent: -999999px;
+}
+    
+

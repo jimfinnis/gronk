@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="icon" href="/favicon.ico">
+
+        <title>{% block title %}Title{% end %}</title>
+
+        <script
+          src="https://code.jquery.com/jquery-3.3.1.min.js"
+          integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+          crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+        <link href="/static/css/jumbotron.css" rel="stylesheet">
+        <link href="/static/css/local.css" rel="stylesheet">
+        {% block extracss %}
+        {% end %}
+    </head>
+    <body>
+    <div>
+        {% block contents %}
+        {% end %}
+    </div>
+    
+    {% block footer %}
+    <footer class="page-footer bg-light pb-1">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <a href="/index">return to index</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                Gronk {{gronk.version}}
+            </div>
+            <div class="col-6 text-right">
+                &copy; {{gronk.author}} {{gronk.year}}
+            </div>
+        </div>
+    </div>
+    </footer>
+    {% end %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+{% block extrascripts %}
+{% end %}
+</body></html>
+    </body>
+</html>

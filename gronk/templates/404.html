@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block extracss %}
+<link href="/static/css/maingrid.css" rel="stylesheet">
+{% end %}
+
+{% block title %}
+404
+{% end %}
+
+{% block contents %}
+<div class="jumbotron text-center blue">
+    <div class="container">
+        <h1 class="jumbotron-heading">404</h1>
+        </h1>
+        <p class="lead">Page "{{name}}" not found</p>
+        
+    </div>
+</div>
+
+<div class="container">
+    <p>
+    This is a gronk server. Try <a href="/index">index</a> to see if there's an index.
+    </p>
+</div>
+
+{% end %}
+
