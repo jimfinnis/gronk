@@ -59,6 +59,7 @@ class MainHandler(WebHandler):
                 name=name,
                 content=html)
         else:
+            self.logger.critical("cannot find file: "+file)
             return self.render_string('404.html',name=name)
         
 
