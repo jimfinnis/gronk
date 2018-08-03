@@ -1,7 +1,5 @@
 """
 The init just contain versioning data.
-The main API is in client.py, and the command line entry point
-is in ui/__main__.py.  See FILES for more structural info.
 """
 
 from collections import namedtuple
