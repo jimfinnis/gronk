@@ -13,6 +13,7 @@ from pkg_resources import resource_filename
 
 # so that we can get links like [[this]]
 from markdown.extensions import wikilinks
+from gronk.extensions import GronkExtensions
 
 # this is the path the data files are read from. It's '.' by default.
 datapath=None
@@ -91,41 +92,22 @@ class MainHandler(WebHandler):
                 return self.render_string('404.html',name=name)
         # we have the file, load it.
         text = codecs.open(file, mode="r", encoding="utf-8").read()
-        # split out the 'special' lines which start with @
-        specials=[]
-        lines=[]
-        text = text.split('\n')
-        for x in text:
-            if x.startswith('@'):
-                specials.append(x[1:])
-            else:
-                lines.append(x)
-        # rebuild the markdown text
-        text = '\n'.join(lines)
-        # now process the specials.
-        navs = []
-        title = name
-        for x in specials:
-            (cmd,rest) = x.split(' ',1)
-            if cmd == 'nav':
-                # 'nav x y z' puts links to x y z at the top
-                navs = rest.split()
-            elif cmd == 'title':
-                # title sets the title string (normally the name)
-                title = rest
-                
-        navs.insert(0,'index') # that's always there.
-        # process the markdown with some extensions
-        html = markdown.markdown(text,extensions=[wikilinks.WikiLinkExtension()])
+
+        # process the markdown with some extensions. Our own extension will
+        # store some data created during processing, so keep a reference to it.
+        ext = GronkExtensions(name)
+        html = markdown.markdown(text,extensions=
+            [wikilinks.WikiLinkExtension(),ext])
+
         # now process and return the template, passing in the name,
-        # whether it's a default, the navs and title built from the specials,
+        # whether it's a default, the navs and title built from the extension,
         # and the raw html which came from the markdown. These will
         # visible to the template.
         return self.render_string('main.html',
             name=name,
             isdefault=isdefault,
-            navs=navs,
-            title=title,
+            navs=ext.navs,
+            title=ext.title,
             content=html)
         
         
