@@ -56,10 +56,20 @@ will render as
 
 
 ## Special stuff
-Any lines in the files which start with `@` are special commands to 
-Gronk. These are currently:
+The `{{ .. }}` block is for special commands.
 
-* `@nav x y z` adds the pages x, y and z to the nav bar. Don't put `index`
+* `{{@nav x y z}}` adds the pages x, y and z to the nav bar. Don't put `index`
 in here; that page is always present.
-* `@title ...` sets the page title
+* `{{@title ...}}` sets the page title
+* `{{@do ... }}` will run a Python statement 
+* `{{..}}` (i.e. no `@` sign) will give the value of a Python expression
 
+The following commands when prefixed by `f` will return their value converted
+to a float, otherwise the underlying variable will be converted to an integer.
+
+* `{{@[f]postinc var n}}` will increment variable `var` by `n`, returning the old value
+* `{{@[f]preinc var n}}` will increment variable `var` by `n`, returning the new value
+* `{{@[f]accum var n}}`  will increment variable `var` by `n`, returning  `n`
+
+Note that all variable manipulation takes place in a namespace private to the 
+page's run.

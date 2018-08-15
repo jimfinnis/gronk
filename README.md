@@ -6,3 +6,6 @@ The URL is stripped down to the final elements, `.md` is appended, and
 it tries to load a Markdown file of that name from the current directory.
 If that fails, you get a 404. Otherwise it will load the data, convert
 from markdown to HTML, and feed it to the `main.html` template.
+
+There are a few special commands accessible through the `{{..}}` mechanism,
+see the default pages for these once you have the system running.
