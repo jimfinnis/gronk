@@ -11,64 +11,68 @@ from markdown.util import etree
 # {{inline}}
 INLINE_RE = r'(\{\{)(.+?)\}\}'
 
+def convnum(n,cmd):
+    if cmd.startswith('f'):
+        return float(n)
+    else:
+        return int(n)
 
 
-# special commands are on lines starting with @
-# They are:
-# @nav x y z    : put links to x, y, z at the top
-# @title ..     : set the title string
-# @do ..        : execute some python statement in a private namespace to this file;
-#                 you can access the variables with the {{..}} pattern.
+# Special commands go in {{...}}
 
-commandRegex = re.compile(r"^@.*")
+# this will do one of several things to something inside {{..}} brackets.
+# {{@nav x y z}}        : put links to x, y, z at the top
+# {{@title ..}}         : set the title string
+# {{@do ..}}            : execute some python statement in a private namespace to this file;
+#                         you can access the variables with the {{..}} pattern.
+# In the following, prepending with "f" leaves the result as float, otherwise it's converted
+# to int for output.
+# {{@[f]postinc var n}} : increment variable by n, return old value
+# {{@[f]preinc var n}}  : increment variable by n, return new value
+# {{@[f]accum var n}}   : increment variable by n, return n
 
-class Commands(Preprocessor):
-    # this is constructed with a pointer to the extension object,
-    # so we can put data in that, and the its creator can get the data out.
-    def __init__(self,ext,md):
-        self.ext = ext
-        super().__init__(md)
-        
-    def run(self, lines):
-        out = []
-        for line in lines:
-            m = commandRegex.match(line)
-            if m:
-                x = line[1:] # get the actual command after the @..
-                # if there's a space, split into command and argument(s) (a string called 'rest')
-                if ' ' in x:
-                    try:
-                        (cmd,rest) = x.split(' ',1)
-                    except ValueError as e:
-                        print("String is:",x)
-                        raise e
-                else:
-                    # otherwise that's the whole command and 'rest' will be None
-                    cmd = x
-                    
-                # process the command themselves
-                if cmd == 'nav':
-                    self.ext.navs=rest.split()
-                elif cmd == 'title':
-                    self.ext.title = rest
-                elif cmd == 'do':
-                    exec(rest,self.ext.vars)
-                else:
-                    raise Exception('unknown special command '+cmd)
-            else:
-                out.append(line)
-        self.ext.navs.insert(0,'index') # that's always there.
-        return out
+# {{expr}}              : evaluate and return expression
 
-
-# this will evaluate an expression in {{..}} and return the value
 class InlinePattern(Pattern):
     def __init__(self,pat,ext):
         self.ext=ext
         super().__init__(pat)
     def handleMatch(self, m):
         text = m.group(3)
-        return str(eval(text,self.ext.vars))
+        if text.startswith('@'):
+            # handle special commands
+            text = text[1:]
+            if ' ' in text:
+                (cmd,rest) = text.split(' ',1)
+            else:
+                cmd = text
+            if cmd == 'postinc' or cmd =='fpostinc':
+                (var,n) = rest.split()
+                prev = self.ext.vars[var]
+                self.ext.vars[var] += float(n)
+                return str(convnum(prev),cmd)
+            elif cmd == 'preinc' or cmd =='fpreinc':
+                (var,n) = rest.split()
+                self.ext.vars[var] += float(n)
+                return str(convnum(self.ext.vars[var],cmd))
+            elif cmd == 'accum' or cmd == 'faccum':
+                (var,n) = rest.split()
+                n = float(n)
+                self.ext.vars[var] += n
+                return str(convnum(n,cmd))
+            elif cmd == 'nav':
+                self.ext.navs=rest.split()
+                return ''
+            elif cmd == 'title':
+                self.ext.title = rest
+                return ''
+            elif cmd == 'do':
+                exec(rest,self.ext.vars)
+                return ''
+            else:
+                raise Exception('unknown inline command: @'+cmd)
+        else:
+            return str(eval(text,self.ext.vars))
         
 class GronkExtensions(Extension):
     def __init__(self,name):
@@ -76,5 +80,4 @@ class GronkExtensions(Extension):
         self.vars={}
         self.title=name
     def extendMarkdown(self,md,globals):
-        md.preprocessors.add('commands',Commands(self,md),'_end')
         md.inlinePatterns.add('gronkinline',InlinePattern(INLINE_RE,self),'_end')
