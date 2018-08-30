@@ -170,7 +170,11 @@ class TornadoServer:
 
 
 
-def main(args=None):
-    TornadoServer().run(False)
+def main():
+    import sys
+    port = 8000
+    if len(sys.argv)>1:
+        port = int(sys.argv[1])
+    TornadoServer(webport=port).run(False)
     
     
