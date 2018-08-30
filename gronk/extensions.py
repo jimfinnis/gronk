@@ -76,7 +76,7 @@ class InlinePattern(Pattern):
         
 class GronkExtensions(Extension):
     def __init__(self,name):
-        self.navs=[]
+        self.navs=['index']
         self.vars={}
         self.title=name
     def extendMarkdown(self,md,globals):
