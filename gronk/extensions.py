@@ -33,6 +33,8 @@ def convnum(n,cmd):
 
 # {{expr}}              : evaluate and return expression
 
+# {{@usage}}            : return Gronk's options as an inline block
+
 class InlinePattern(Pattern):
     def __init__(self,pat,ext):
         self.ext=ext
@@ -69,12 +71,17 @@ class InlinePattern(Pattern):
             elif cmd == 'do':
                 exec(rest,self.ext.vars)
                 return ''
+            elif cmd == 'usage':
+                el = etree.Element('pre')
+                el.text = GronkExtensions.usage
+                return el
             else:
                 raise Exception('unknown inline command: @'+cmd)
         else:
             return str(eval(text,self.ext.vars))
         
 class GronkExtensions(Extension):
+    usage = ''
     def __init__(self,name):
         self.navs=['index']
         self.vars={}
