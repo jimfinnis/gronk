@@ -31,9 +31,12 @@ def convnum(n,cmd):
 # {{@[f]preinc var n}}  : increment variable by n, return new value
 # {{@[f]accum var n}}   : increment variable by n, return n
 
-# {{expr}}              : evaluate and return expression
+# {{@note}}              : show rest of line in a green box
+# {{@warn}}              : show rest of line in a red box
 
 # {{@usage}}            : return Gronk's options as an inline block
+
+# {{expr}}              : evaluate and return expression
 
 class InlinePattern(Pattern):
     def __init__(self,pat,ext):
@@ -75,6 +78,18 @@ class InlinePattern(Pattern):
                 el = etree.Element('pre')
                 el.text = GronkExtensions.usage
                 return el
+            elif cmd == 'note':
+                el = etree.Element('div')
+                el.set('class','alert alert-primary')
+                el.text = rest
+                return el
+            elif cmd == 'warn':
+                el = etree.Element('div')
+                el.set('class','alert alert-danger')
+                el.text = rest
+                return el
+                
+                
             else:
                 raise Exception('unknown inline command: @'+cmd)
         else:
