@@ -78,6 +78,7 @@ class NotFoundHandler(tornado.web.RequestHandler):
 
 class MarkdownHandler(WebHandler):
     def servefile(self,dir,name):
+        self.logger.critical('looking for '+name+' in '+dir)
         # No caching
         self.set_header('Cache-control','no-cache, no-store, must-revalidate')
         # if the name ends with a slash remove it
@@ -107,7 +108,7 @@ class MarkdownHandler(WebHandler):
         # right..
         ext = GronkExtensions(name)
         html = markdown.markdown(text,extensions=
-            [wikilinks.WikiLinkExtension(),ext])
+            [wikilinks.WikiLinkExtension(end_url=''),ext])
 
         self.logger.info("************************** NODE SERVED: "+name)
 
