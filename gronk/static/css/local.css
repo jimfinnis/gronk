@@ -25,6 +25,9 @@
     display: inline-flex;
 }
 
+.pre {
+    color: green;
+}
 
 
 /* Hiding the checkbox, but allowing it to be focused */
