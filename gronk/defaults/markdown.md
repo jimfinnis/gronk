@@ -1,4 +1,4 @@
-@title Markdown as used in Gronk
+{{@title Markdown as used in Gronk}}
 
 # Markdown
 A quick guide to the markdown we support here.
@@ -23,6 +23,9 @@ WikiLinks won't work with full URLS, just page names.
 
 Alternatively, you can use  `[text](pagename or URL)`, so `[return to index](/index)` should work: [return to index](/index).
 Note the slash at the start of the URL, that's important.
+
+Note that WikiLinks and normal links behave differently in 
+subdirectory gronks. See below.
 
 
 ## Lists
@@ -61,7 +64,9 @@ The `{{ .. }}` block is for special commands.
 * `{{@nav x y z}}` adds the pages x, y and z to the nav bar. Don't put `index`
 in here; that page is always present.
 * `{{@title ...}}` sets the page title
-* `{{@do ... }}` will run a Python statement 
+* `{{@do ... }}` will run a Python statement and generate nothing (it's 
+often used to set a variable the rest of the page can access, e.g.
+`{{@do x=0}}`
 * `{{..}}` (i.e. no `@` sign) will give the value of a Python expression
 
 The following commands when prefixed by `f` will return their value converted
@@ -73,3 +78,11 @@ to a float, otherwise the underlying variable will be converted to an integer.
 
 Note that all variable manipulation takes place in a namespace private to the 
 page's run.
+
+
+# Subdirectory gronks
+You can create multiple sets of markdown files in different subdirectories
+of the one in which Gronk runs. Each set acts as a separate instance,
+with links and navs pointing to within the subdirectory **except for WikiLinks** - these
+always point to the root gronk. This is probably due to how the WikiLinks
+extension functions internally.

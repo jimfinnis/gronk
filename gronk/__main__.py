@@ -4,6 +4,7 @@ import tornado.web
 import ssl
 import os
 import logging
+from optparse import OptionParser
 import codecs,markdown
 import gronk
 
@@ -17,6 +18,14 @@ from gronk.extensions import GronkExtensions
 
 # this is the path the data files are read from. It's '.' by default.
 datapath=None
+
+# massage the directory name so it works in links - we form a link in a subdir
+# by using {{d}}{{name}}.
+def getdirprefix(d):
+    if d=='.' or d=='/':
+        return ''
+    else:
+         return d+'/'
 
 # All web request handlers are derived from this - it adds 'gronk'
 # to the namespace, withe the info structure set up in __init__.py.
@@ -61,15 +70,15 @@ class WebHandler(RootWebHandler):
 class NotFoundHandler(tornado.web.RequestHandler):
     def prepare(self):
         self.set_status(404)
-        return self.render('404.html')
+        print("THIS RENDERER")
+        return self.render('404.html',d=getdirprefix('.'))
 
-# our main handler, derived from WebHandler (as all proper handlers should be).
-# It defines _get(), which takes the additional 'name' argument - the first
-# group captured in the URL defined by the application. The get() method
-# of the WebHandler class will call this.
+# this adds to WebHandler the facility for processing markdown, serving
+# files given a directory and a name.
 
-class MainHandler(WebHandler):
-    def _get(self,request,name):
+class MarkdownHandler(WebHandler):
+    def servefile(self,dir,name):
+        self.logger.critical('looking for '+name+' in '+dir)
         # No caching
         self.set_header('Cache-control','no-cache, no-store, must-revalidate')
         # if the name ends with a slash remove it
@@ -77,8 +86,8 @@ class MainHandler(WebHandler):
             name = name[:-1]
         # make the filename by appending .md, the markdown suffix
         mdname = name+'.md'
-        # try to find it in the datapath
-        file = os.path.join(datapath,mdname)
+        # try to find it in the datapath and subdir.
+        file = os.path.join(datapath,dir,mdname)
         if os.path.exists(file):
             # found it, so this isn't a default page
             isdefault=False
@@ -89,27 +98,47 @@ class MainHandler(WebHandler):
             if not os.path.exists(file):
                 # oops.
                 self.logger.critical("cannot find file: "+file)
-                return self.render_string('404.html',name=name)
+                return self.render_string('404.html',name=name,d=getdirprefix(dir))
         # we have the file, load it.
         text = codecs.open(file, mode="r", encoding="utf-8").read()
-
+        
         # process the markdown with some extensions. Our own extension will
         # store some data created during processing, so keep a reference to it.
+        # Note that we change directory so any links should come out
+        # right..
         ext = GronkExtensions(name)
         html = markdown.markdown(text,extensions=
-            [wikilinks.WikiLinkExtension(),ext])
+            [wikilinks.WikiLinkExtension(end_url=''),ext])
+
+        self.logger.info("************************** NODE SERVED: "+name)
 
         # now process and return the template, passing in the name,
         # whether it's a default, the navs and title built from the extension,
         # and the raw html which came from the markdown. These will
         # visible to the template.
+
         return self.render_string('main.html',
             name=name,
             isdefault=isdefault,
             navs=ext.navs,
+            d=getdirprefix(dir),
             title=ext.title,
             content=html)
+    
+
+# our main handler, derived from WebHandler (as all proper handlers should be)
+# via WebHandler.
+# It defines _get(), which takes the additional 'name' argument - the first
+# group captured in the URL defined by the application. The get() method
+# of the WebHandler class will call this.
+
+class MainHandler(MarkdownHandler):
+    def _get(self,request,name):
+        return self.servefile('.',name)
         
+class SubDirHandler(MarkdownHandler):
+    def _get(self,request,dir,name):
+        return self.servefile(dir,name)
         
 
 # this encapsulates the tornado server details.
@@ -143,7 +172,9 @@ class TornadoServer:
             # that file
             URL(r"/static/(.*)",tornado.web.StaticFileHandler,
                 kwargs={'path':staticroot}),
-            # everything else goes to the main handler
+            # subdirectories each have their own set of files
+            URL(r"/(.*)/(.*)",SubDirHandler),
+            # everything else goes to the main handler for the current directory
             URL(r"/(.*)",MainHandler)
             ],
             # template locations
@@ -171,10 +202,25 @@ class TornadoServer:
 
 
 def main():
+    parser = OptionParser()
+    parser.add_option('-p','--port',dest='port',help='set port to PORT',metavar='PORT',
+        type='int',default=8000)
+    parser.add_option('','--log',dest='loglevel',default='INFO',
+        help='set logging level (debug/info/warning/error/critical)')
+    
+    (options,args)=parser.parse_args()
+    
+    GronkExtensions.usage = parser.format_help() # for the {{@usage} tag
+    numeric_loglevel = getattr(logging, options.loglevel.upper(), None)
+    if not isinstance(numeric_loglevel, int):
+        raise ValueError('Invalid log level: %s' % options.loglevel)
+
+    # this is an ugly hack
+    logger = logging.getLogger("gronk")
+    logger.setLevel(numeric_loglevel)
+
+    print('Setting log level to %s [%s]' % (options.loglevel.upper(),numeric_loglevel))    
     import sys
-    port = 8000
-    if len(sys.argv)>1:
-        port = int(sys.argv[1])
-    TornadoServer(webport=port).run(False)
+    TornadoServer(webport=options.port).run(False)
     
     
