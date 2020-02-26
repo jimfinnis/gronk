@@ -1,5 +1,5 @@
-@title Index
-@nav markdown
+{{@title Index}}
+{{@nav markdown}}
 
 # Index
 Add an index here.
