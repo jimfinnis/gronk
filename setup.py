@@ -7,16 +7,6 @@ import sys
 if sys.version_info < (3,4):
     sys.exit('Sorry, Python < 3.4 is not supported')
 
-def package_files(directory):
-    paths = []
-    for (path, directories, filenames) in os.walk(directory):
-        for filename in filenames:
-            paths.append(os.path.join('..', path, filename))
-    return paths
-
-static_files = package_files('gronk/static')
-default_pages = package_files('gronk/defaults')
-
 setup(name='gronk',
       version=version,
       description="Tornado based miniwiki",
@@ -39,9 +29,5 @@ setup(name='gronk',
         'console_scripts': [
             'gronk = gronk.__main__:main'
         ]
-      },
-      package_data = {
-        'gronk': {'':static_files},
-        'gronk': {'':default_pages}
-      },
+      }
       )

@@ -9,3 +9,6 @@ from markdown to HTML, and feed it to the `main.html` template.
 
 There are a few special commands accessible through the `{{..}}` mechanism,
 see the default pages for these once you have the system running.
+
+Install with "python3 setup.py install" as usual. Should work now; had some
+problems with data files.

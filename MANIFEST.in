@@ -1,0 +1,3 @@
+recursive-include gronk/static/ *.css
+recursive-include gronk/templates/ *.html
+recursive-include gronk/defaults/ *.md
